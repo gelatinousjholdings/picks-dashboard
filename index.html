@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EdgeModel Picks</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #e0e0e0; font-family: 'Courier New', monospace; padding: 20px; }
+  .header { border-bottom: 1px solid #222; padding-bottom: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-size: 20px; font-weight: bold; color: #fff; letter-spacing: -0.5px; }
+  .logo span { color: #00c97a; }
+  .date { font-size: 12px; color: #555; }
+  .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 14px; text-align: center; }
+  .stat-num { font-size: 24px; font-weight: bold; color: #fff; }
+  .stat-num.green { color: #00c97a; }
+  .stat-num.red { color: #e05555; }
+  .stat-lbl { font-size: 11px; color: #555; margin-top: 4px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 20px; }
+  .tab { padding: 6px 16px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid #222; background: #111; color: #666; transition: all .15s; font-family: inherit; }
+  .tab.active { background: #00c97a; color: #003d25; border-color: #00c97a; font-weight: bold; }
+  .section-title { font-size: 11px; color: #444; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .pick { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+  .pick:hover { border-color: #333; }
+  .pick.edge { border-left: 3px solid #00c97a; border-radius: 0 8px 8px 0; }
+  .pick.hit { border-left: 3px solid #00c97a; border-radius: 0 8px 8px 0; }
+  .pick.miss { border-left: 3px solid #e05555; border-radius: 0 8px 8px 0; }
+  .pick-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .pick-sport { font-size: 10px; color: #444; margin-bottom: 3px; }
+  .pick-teams { font-size: 14px; font-weight: bold; color: #fff; }
+  .pick-sub { font-size: 11px; color: #555; margin-top: 2px; }
+  .pick-prob { font-size: 22px; font-weight: bold; color: #fff; text-align: right; }
+  .pick-prob-lbl { font-size: 10px; color: #444; text-align: right; }
+  .pick-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0; }
+  .metric { background: #0d0d0d; border-radius: 6px; padding: 8px; }
+  .metric-lbl { font-size: 10px; color: #444; }
+  .metric-val { font-size: 13px; font-weight: bold; color: #ccc; margin-top: 2px; }
+  .conf-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .conf-bar { flex: 1; height: 3px; background: #1e1e1e; border-radius: 2px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 2px; background: #00c97a; }
+  .rationale { font-size: 12px; color: #555; line-height: 1.6; border-top: 1px solid #1a1a1a; padding-top: 10px; margin-top: 10px; display: none; }
+  .pick.open .rationale { display: block; }
+  .outcome { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1a1a1a; font-size: 11px; }
+  .outcome-lbl { color: #444; }
+  .badge { display: inline-block; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 4px; }
+  .b-green { background: #003d25; color: #00c97a; }
+  .b-red { background: #3d0000; color: #e05555; }
+  .b-yellow { background: #3d2e00; color: #c97a00; }
+  .b-gray { background: #1a1a1a; color: #666; }
+  .history-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .history-table th { text-align: left; padding: 8px 10px; color: #444; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #1e1e1e; font-weight: normal; }
+  .history-table td { padding: 10px; border-bottom: 1px solid #141414; color: #aaa; }
+  .history-table tr:hover td { background: #0d0d0d; }
+  .empty { text-align: center; padding: 40px; color: #333; font-size: 13px; }
+  .loading { text-align: center; padding: 40px; color: #333; }
+  .nfl-box { background: #111; border: 1px solid #1e1e1e; border-radius: 8px; padding: 32px; text-align: center; }
+  .nfl-big { font-size: 32px; font-weight: bold; color: #fff; margin-bottom: 8px; }
+  .nfl-sub { font-size: 13px; color: #444; line-height: 1.7; }
+  .sport-filter { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .sfil { padding: 4px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; border: 1px solid #222; background: #0d0d0d; color: #555; font-family: inherit; transition: all .15s; }
+  .sfil.on { border-color: #333; color: #ccc; background: #1a1a1a; }
+  @media (max-width: 600px) { .summary-grid { grid-template-columns: repeat(3, 1fr); } .pick-metrics { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Edge<span>Model</span></div>
+  <div class="date" id="today-date"></div>
+</div>
+
+<div class="summary-grid" id="summary-grid">
+  <div class="stat"><div class="stat-num" id="s-total">—</div><div class="stat-lbl">All time picks</div></div>
+  <div class="stat"><div class="stat-num green" id="s-hits">—</div><div class="stat-lbl">Hits</div></div>
+  <div class="stat"><div class="stat-num red" id="s-misses">—</div><div class="stat-lbl">Misses</div></div>
+  <div class="stat"><div class="stat-num" id="s-rate">—</div><div class="stat-lbl">Hit rate</div></div>
+  <div class="stat"><div class="stat-num" id="s-avg">—</div><div class="stat-lbl">Avg prob</div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setTab('today')">Today</button>
+  <button class="tab" onclick="setTab('mlb')">MLB</button>
+  <button class="tab" onclick="setTab('nba')">NBA</button>
+  <button class="tab" onclick="setTab('nfl')">NFL</button>
+  <button class="tab" onclick="setTab('history')">All history</button>
+</div>
+
+<div id="tab-today"></div>
+<div id="tab-mlb" style="display:none"></div>
+<div id="tab-nba" style="display:none"></div>
+<div id="tab-nfl" style="display:none"></div>
+<div id="tab-history" style="display:none"></div>
+
+<script>
+  const SUPABASE_URL = 'https://icshytvjicvugdhcbmzt.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljc2h5dHZqaWN2dWdkaGNibXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzczNzEsImV4cCI6MjA5MTI1MzM3MX0.1vWQO-dJiTANuAtGCImG9yfMHSqxnr7idI5EP_kx5EI';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let allPicks = [];
+  let currentTab = 'today';
+
+  document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  async function loadAll() {
+    const { data, error } = await sb.from('picks').select('*').order('pick_date', { ascending: false }).order('projected_prob', { ascending: false });
+    if (error) { console.error(error); return; }
+    allPicks = data || [];
+    renderSummary();
+    renderTab('today');
+  }
+
+  function renderSummary() {
+    const resolved = allPicks.filter(p => p.hit !== null);
+    const hits = resolved.filter(p => p.hit).length;
+    const misses = resolved.length - hits;
+    const rate = resolved.length ? (hits / resolved.length * 100).toFixed(1) : '—';
+    const avgProb = allPicks.length ? (allPicks.reduce((a,b) => a + b.projected_prob, 0) / allPicks.length).toFixed(1) : '—';
+    document.getElementById('s-total').textContent = allPicks.length;
+    document.getElementById('s-hits').textContent = hits;
+    document.getElementById('s-misses').textContent = misses;
+    document.getElementById('s-rate').textContent = resolved.length ? rate + '%' : '—';
+    document.getElementById('s-avg').textContent = avgProb !== '—' ? avgProb + '%' : '—';
+  }
+
+  function setTab(t) {
+    currentTab = t;
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    event.target.classList.add('active');
+    ['today','mlb','nba','nfl','history'].forEach(id => document.getElementById('tab-'+id).style.display = 'none');
+    document.getElementById('tab-'+t).style.display = 'block';
+    renderTab(t);
+  }
+
+  function renderTab(t) {
+    if (t === 'today') renderPicks('today', allPicks.filter(p => p.pick_date === new Date().toISOString().slice(0,10)));
+    else if (t === 'mlb') renderPicks('mlb', allPicks.filter(p => p.sport === 'MLB'));
+    else if (t === 'nba') renderPicks('nba', allPicks.filter(p => p.sport === 'NBA'));
+    else if (t === 'nfl') renderNFL();
+    else if (t === 'history') renderHistory();
+  }
+
+  function confColor(prob) {
+    if (prob >= 85) return '#00c97a';
+    if (prob >= 70) return '#4a9eff';
+    return '#c97a00';
+  }
+
+  function renderPicks(tabId, picks) {
+    const el = document.getElementById('tab-'+tabId);
+    if (!picks.length) { el.innerHTML = '<div class="empty">No picks found.</div>'; return; }
+    const today = new Date().toISOString().slice(0,10);
+    let html = `<div class="section-title">${picks.length} pick${picks.length>1?'s':''}</div>`;
+    picks.forEach((p, i) => {
+      const isToday = p.pick_date === today;
+      const hitClass = p.hit === null ? (isToday ? 'edge' : '') : (p.hit ? 'hit' : 'miss');
+      const outcomeHTML = p.hit === null
+        ? `<div class="outcome"><span class="outcome-lbl">Result:</span><span class="badge b-yellow">Pending</span></div>`
+        : `<div class="outcome"><span class="outcome-lbl">Result:</span><span class="badge ${p.hit ? 'b-green' : 'b-red'}">${p.hit ? 'HIT' : 'MISS'}</span><span style="color:#444;margin-left:8px;">${p.actual_result || ''}</span></div>`;
+      html += `
+      <div class="pick ${hitClass}" onclick="this.classList.toggle('open')">
+        <div class="pick-sport">${p.sport} · ${p.pick_date} · ${p.game_time_est || ''}</div>
+        <div class="pick-top">
+          <div>
+            <div class="pick-teams">${p.away_team} @ ${p.home_team}</div>
+            <div class="pick-sub">Pick: ${p.pick_side}</div>
+          </div>
+          <div>
+            <div class="pick-prob">${p.projected_prob}%</div>
+            <div class="pick-prob-lbl">win prob</div>
+          </div>
+        </div>
+        <div class="pick-metrics">
+          <div class="metric"><div class="metric-lbl">Proj. margin</div><div class="metric-val">${p.projected_margin > 0 ? '+' : ''}${p.projected_margin}</div></div>
+          <div class="metric"><div class="metric-lbl">Proj. total</div><div class="metric-val">${p.projected_total}</div></div>
+          <div class="metric"><div class="metric-lbl">Confidence</div><div class="metric-val">${p.confidence || '—'}</div></div>
+        </div>
+        <div class="conf-bar-wrap"><div class="conf-bar"><div class="conf-fill" style="width:${p.projected_prob}%;background:${confColor(p.projected_prob)};"></div></div></div>
+        <div class="rationale">${p.rationale || 'No rationale available.'}</div>
+        ${outcomeHTML}
+      </div>`;
+    });
+    el.innerHTML = html;
+  }
+
+  function renderNFL() {
+    document.getElementById('tab-nfl').innerHTML = `
+    <div class="nfl-box">
+      <div class="nfl-big">Offseason</div>
+      <div class="nfl-sub">Super Bowl LX — Seattle Seahawks 29, New England Patriots 13<br>Feb 8, 2026<br><br>Next NFL action: Preseason August 2026.<br>Model tracking roster moves and draft picks.</div>
+    </div>`;
+  }
+
+  function renderHistory() {
+    const el = document.getElementById('tab-history');
+    if (!allPicks.length) { el.innerHTML = '<div class="empty">No history yet.</div>'; return; }
+    let html = `
+    <div class="section-title">${allPicks.length} total picks</div>
+    <table class="history-table">
+      <thead><tr>
+        <th>Date</th><th>Sport</th><th>Matchup</th><th>Pick</th><th>Prob</th><th>Margin</th><th>Result</th>
+      </tr></thead><tbody>`;
+    allPicks.forEach(p => {
+      const badge = p.hit === null ? '<span class="badge b-yellow">Pending</span>' : (p.hit ? '<span class="badge b-green">HIT</span>' : '<span class="badge b-red">MISS</span>');
+      html += `<tr>
+        <td>${p.pick_date}</td>
+        <td>${p.sport}</td>
+        <td style="color:#ccc">${p.away_team} @ ${p.home_team}</td>
+        <td style="color:#ccc">${p.pick_side}</td>
+        <td>${p.projected_prob}%</td>
+        <td>${p.projected_margin > 0 ? '+' : ''}${p.projected_margin}</td>
+        <td>${badge}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    el.innerHTML = html;
+  }
+
+  loadAll();
+</script>
+</body>
+</html>
