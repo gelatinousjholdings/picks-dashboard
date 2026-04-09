@@ -3,111 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EdgeModel — Quantitative Sports Analytics</title>
+<title>EdgeModel — Daily Picks</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&family=Barlow+Condensed:wght@600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#080e1c;color:#e8e4d9;font-family:'DM Sans',sans-serif;min-height:100vh;}
-.wrap{max-width:960px;margin:0 auto;padding:28px 20px;}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #1a2540;}
-.logo{font-family:'Playfair Display',serif;font-size:26px;color:#f0c040;letter-spacing:-0.5px;}
-.logo-sub{font-size:11px;color:#3a4a6b;letter-spacing:0.12em;text-transform:uppercase;margin-top:2px;}
-.date-badge{font-size:12px;color:#3a4a6b;background:#0d1628;border:1px solid #1a2540;padding:6px 14px;border-radius:20px;letter-spacing:0.04em;}
-.stats-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:28px;}
-.stat{background:#0d1628;border:1px solid #1a2540;border-radius:10px;padding:16px 12px;text-align:center;}
-.stat-n{font-family:'Playfair Display',serif;font-size:26px;color:#e8e4d9;}
-.stat-n.gold{color:#f0c040;}
-.stat-n.red{color:#c0392b;}
-.stat-l{font-size:10px;color:#3a4a6b;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;}
-.tabs{display:flex;gap:4px;margin-bottom:24px;background:#0d1628;padding:4px;border-radius:10px;border:1px solid #1a2540;flex-wrap:wrap;}
-.tab{flex:1;padding:8px 10px;border-radius:7px;font-size:12px;cursor:pointer;border:none;background:transparent;color:#3a4a6b;font-family:'DM Sans',sans-serif;letter-spacing:0.04em;transition:all .2s;text-align:center;min-width:60px;}
-.tab.active{background:#152036;color:#f0c040;font-weight:500;}
-.tab:hover:not(.active){color:#8899bb;}
-.section-label{font-size:10px;color:#3a4a6b;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;padding-left:2px;}
-.pick{background:#0d1628;border:1px solid #1a2540;border-radius:12px;padding:18px 20px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
-.pick:hover{border-color:#2a3a5a;}
-.pick.top{border-left:3px solid #f0c040;border-radius:0 12px 12px 0;}
-.pick.hit{border-left:3px solid #27ae60;border-radius:0 12px 12px 0;}
-.pick.miss{border-left:3px solid #c0392b;border-radius:0 12px 12px 0;}
-.pick-sport{font-size:10px;color:#3a4a6b;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;}
-.pick-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
-.pick-teams{font-family:'Playfair Display',serif;font-size:16px;color:#e8e4d9;line-height:1.3;}
-.pick-side{font-size:12px;color:#6a7a9b;margin-top:4px;}
-.pick-prob{text-align:right;min-width:70px;}
-.pick-prob-num{font-family:'Playfair Display',serif;font-size:28px;color:#f0c040;line-height:1;}
-.pick-prob-lbl{font-size:10px;color:#3a4a6b;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
-.pick-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0;}
-.pm{background:#080e1c;border-radius:8px;padding:10px 12px;border:1px solid #141e30;}
-.pm-l{font-size:10px;color:#3a4a6b;text-transform:uppercase;letter-spacing:0.06em;}
-.pm-v{font-size:14px;font-weight:500;color:#c8c4b9;margin-top:3px;}
-.conf-wrap{display:flex;align-items:center;gap:10px;margin-top:12px;}
-.conf-bar{flex:1;height:2px;background:#1a2540;border-radius:1px;overflow:hidden;}
-.conf-fill{height:100%;border-radius:1px;}
-.badge{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:5px;letter-spacing:0.04em;}
-.b-gold{background:#2a1f00;color:#f0c040;}
-.b-blue{background:#0d1e35;color:#4a90d9;}
-.b-green{background:#0d2010;color:#27ae60;}
-.b-red{background:#200d0d;color:#c0392b;}
-.b-yellow{background:#2a2000;color:#d4a017;}
-.b-gray{background:#141e30;color:#3a4a6b;}
-.rationale{font-size:13px;color:#6a7a9b;line-height:1.7;border-top:1px solid #141e30;padding-top:12px;margin-top:12px;display:none;font-weight:300;}
-.pick.open .rationale{display:block;}
-.outcome-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #141e30;font-size:11px;color:#3a4a6b;}
-.chevron{font-size:10px;color:#3a4a6b;margin-left:auto;transition:transform .2s;}
-.pick.open .chevron{transform:rotate(180deg);}
-.key-factors{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
-.factor-tag{font-size:10px;background:#111e35;color:#4a6a9b;padding:3px 8px;border-radius:4px;border:1px solid #1a2540;}
-.nfl-box{background:#0d1628;border:1px solid #1a2540;border-radius:12px;padding:48px;text-align:center;}
-.nfl-big{font-family:'Playfair Display',serif;font-size:36px;color:#f0c040;margin-bottom:10px;}
-.nfl-sub{font-size:13px;color:#3a4a6b;line-height:1.8;font-weight:300;}
-.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
-.hist-table th{text-align:left;padding:8px 12px;color:#3a4a6b;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid #1a2540;font-weight:400;}
-.hist-table td{padding:12px;border-bottom:1px solid #0f1a2e;color:#8899bb;}
-.hist-table tr:hover td{background:#0d1628;}
-.empty{text-align:center;padding:48px;color:#3a4a6b;font-size:13px;font-weight:300;}
-.loading{text-align:center;padding:48px;color:#3a4a6b;font-size:13px;letter-spacing:0.06em;}
-.yday-bar{background:#0d1628;border:1px solid #1a2540;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.yday-label{font-size:10px;color:#3a4a6b;text-transform:uppercase;letter-spacing:0.1em;}
-.yday-stats{display:flex;gap:20px;}
+body{background:#0f0f13;color:#ffffff;font-family:'Barlow',sans-serif;min-height:100vh;}
+.app{max-width:960px;margin:0 auto;padding:20px 16px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;color:#fff;letter-spacing:-0.5px;}
+.logo span{color:#53d98e;}
+.date-pill{font-size:11px;font-weight:700;color:#666;background:#1a1a22;padding:6px 14px;border-radius:20px;letter-spacing:0.08em;text-transform:uppercase;}
+.yday-strip{background:#1a1a22;border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.yday-label{font-size:11px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.1em;}
+.yday-stats{display:flex;gap:24px;}
 .yday-stat{text-align:center;}
-.yday-num{font-family:'Playfair Display',serif;font-size:18px;color:#e8e4d9;}
-.yday-num.gold{color:#f0c040;}
-.yday-num.red{color:#c0392b;}
-.yday-lbl{font-size:10px;color:#3a4a6b;text-transform:uppercase;letter-spacing:0.06em;}
-@media(max-width:600px){.stats-row{grid-template-columns:repeat(3,1fr);}.pick-metrics{grid-template-columns:repeat(2,1fr);}.pick-prob-num{font-size:22px;}}
+.yday-num{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#fff;}
+.yday-num.g{color:#53d98e;}
+.yday-num.r{color:#ff4f4f;}
+.yday-lbl{font-size:10px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.06em;}
+.stats-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:20px;}
+.stat{background:#1a1a22;border-radius:10px;padding:14px 10px;text-align:center;}
+.stat-n{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fff;line-height:1;}
+.stat-n.g{color:#53d98e;}
+.stat-n.r{color:#ff4f4f;}
+.stat-l{font-size:10px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;}
+.tabs{display:flex;gap:4px;margin-bottom:20px;background:#1a1a22;padding:4px;border-radius:10px;flex-wrap:wrap;}
+.tab{flex:1;padding:9px 8px;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;border:none;background:transparent;color:#555;font-family:'Barlow',sans-serif;letter-spacing:0.05em;text-transform:uppercase;transition:all .15s;text-align:center;min-width:50px;}
+.tab.active{background:#53d98e;color:#0a1f12;}
+.tab:hover:not(.active){color:#aaa;}
+.section-label{font-size:11px;font-weight:800;color:#555;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
+.pick{background:#1a1a22;border-radius:14px;margin-bottom:10px;cursor:pointer;transition:background .15s;overflow:hidden;}
+.pick:hover{background:#1f1f2a;}
+.pick-accent{height:4px;background:#2a2a35;}
+.pick.top .pick-accent{background:#53d98e;}
+.pick.hit .pick-accent{background:#53d98e;}
+.pick.miss .pick-accent{background:#ff4f4f;}
+.pick-body{padding:16px 18px;}
+.pick-sport-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sport-badge{font-size:10px;font-weight:900;padding:3px 10px;border-radius:4px;letter-spacing:0.08em;text-transform:uppercase;}
+.sport-nba{background:#1e3a5f;color:#5b9bd5;}
+.sport-mlb{background:#3d1f1f;color:#d55b5b;}
+.sport-nfl{background:#1f3d2a;color:#5bd578;}
+.time-label{font-size:11px;font-weight:700;color:#555;}
+.pick-main-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;}
+.pick-teams{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;}
+.pick-side-label{font-size:12px;font-weight:800;color:#53d98e;text-transform:uppercase;letter-spacing:0.05em;}
+.pick-right{text-align:right;min-width:80px;}
+.prob-big{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;color:#fff;line-height:1;}
+.prob-label{font-size:10px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.08em;}
+.metrics-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:12px;}
+.metric{background:#0f0f13;border-radius:8px;padding:10px 12px;}
+.metric-l{font-size:10px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.06em;}
+.metric-v{font-size:15px;font-weight:800;color:#fff;margin-top:3px;}
+.conf-row{display:flex;align-items:center;gap:10px;}
+.conf-track{flex:1;height:4px;background:#2a2a35;border-radius:2px;overflow:hidden;}
+.conf-fill{height:100%;border-radius:2px;}
+.conf-badge{font-size:10px;font-weight:800;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em;}
+.cb-vh{background:#0f2d1a;color:#53d98e;}
+.cb-h{background:#0f1e35;color:#5b9bd5;}
+.cb-m{background:#2d2000;color:#d5a85b;}
+.cb-lm{background:#2d1800;color:#d5755b;}
+.factors-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.factor{font-size:10px;font-weight:700;background:#0f0f13;color:#666;padding:4px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:0.04em;}
+.rationale{font-size:13px;font-weight:500;color:#888;line-height:1.6;border-top:1px solid #2a2a35;padding-top:12px;margin-top:12px;display:none;}
+.pick.open .rationale{display:block;}
+.outcome-row{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #2a2a35;font-size:11px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.04em;}
+.res-badge{font-size:10px;font-weight:800;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.06em;}
+.rb-hit{background:#0f2d1a;color:#53d98e;}
+.rb-miss{background:#2d0f0f;color:#ff4f4f;}
+.rb-pend{background:#2d2200;color:#d5a85b;}
+.chevron{font-size:10px;color:#555;margin-left:auto;transition:transform .2s;}
+.pick.open .chevron{transform:rotate(180deg);}
+.prop-player{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:#fff;}
+.prop-line-big{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;margin-top:2px;}
+.prop-over{color:#53d98e;}
+.prop-under{color:#ff4f4f;}
+.nfl-box{background:#1a1a22;border-radius:14px;padding:48px;text-align:center;}
+.nfl-big{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:#fff;margin-bottom:10px;text-transform:uppercase;letter-spacing:-1px;}
+.nfl-sub{font-size:13px;font-weight:600;color:#555;line-height:1.9;}
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
+.hist-table th{text-align:left;padding:8px 12px;color:#555;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #2a2a35;}
+.hist-table td{padding:12px;border-bottom:1px solid #1f1f2a;color:#aaa;font-weight:600;}
+.hist-table tr:hover td{background:#1f1f2a;}
+.empty{text-align:center;padding:48px;color:#555;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
+.loading{text-align:center;padding:48px;color:#555;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
+@media(max-width:600px){.stats-row{grid-template-columns:repeat(3,1fr);}.metrics-row{grid-template-columns:repeat(2,1fr);}.prob-big{font-size:32px;}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
   <div class="topbar">
-    <div>
-      <div class="logo">EdgeModel</div>
-      <div class="logo-sub">Quantitative Sports Analytics</div>
+    <div class="logo">Edge<span>Model</span></div>
+    <div class="date-pill" id="today-date"></div>
+  </div>
+
+  <div class="yday-strip" id="yday-strip" style="display:none">
+    <div><div class="yday-label">Yesterday's results</div></div>
+    <div class="yday-stats">
+      <div class="yday-stat"><div class="yday-num" id="y-total">—</div><div class="yday-lbl">Picks</div></div>
+      <div class="yday-stat"><div class="yday-num g" id="y-hits">—</div><div class="yday-lbl">Hits</div></div>
+      <div class="yday-stat"><div class="yday-num r" id="y-misses">—</div><div class="yday-lbl">Misses</div></div>
+      <div class="yday-stat"><div class="yday-num g" id="y-rate">—</div><div class="yday-lbl">Rate</div></div>
     </div>
-    <div class="date-badge" id="today-date"></div>
   </div>
 
   <div class="stats-row">
     <div class="stat"><div class="stat-n" id="s-total">—</div><div class="stat-l">All time</div></div>
-    <div class="stat"><div class="stat-n gold" id="s-hits">—</div><div class="stat-l">Hits</div></div>
-    <div class="stat"><div class="stat-n red" id="s-misses">—</div><div class="stat-l">Misses</div></div>
-    <div class="stat"><div class="stat-n gold" id="s-rate">—</div><div class="stat-l">Hit rate</div></div>
+    <div class="stat"><div class="stat-n g" id="s-hits">—</div><div class="stat-l">Hits</div></div>
+    <div class="stat"><div class="stat-n r" id="s-misses">—</div><div class="stat-l">Misses</div></div>
+    <div class="stat"><div class="stat-n g" id="s-rate">—</div><div class="stat-l">Hit rate</div></div>
     <div class="stat"><div class="stat-n" id="s-avg">—</div><div class="stat-l">Avg prob</div></div>
-  </div>
-
-  <div id="yday-bar" style="display:none" class="yday-bar">
-    <div>
-      <div class="yday-label">Yesterday's results</div>
-    </div>
-    <div class="yday-stats">
-      <div class="yday-stat"><div class="yday-num" id="y-total">—</div><div class="yday-lbl">Picks</div></div>
-      <div class="yday-stat"><div class="yday-num gold" id="y-hits">—</div><div class="yday-lbl">Hits</div></div>
-      <div class="yday-stat"><div class="yday-num red" id="y-misses">—</div><div class="yday-lbl">Misses</div></div>
-      <div class="yday-stat"><div class="yday-num gold" id="y-rate">—</div><div class="yday-lbl">Rate</div></div>
-    </div>
   </div>
 
   <div class="tabs">
@@ -127,10 +135,9 @@ body{background:#080e1c;color:#e8e4d9;font-family:'DM Sans',sans-serif;min-heigh
   <div id="tab-history" style="display:none"></div>
 
 </div>
-
 <script>
-const SUPABASE_URL = 'https://icshytvjicvugdhcbmzt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imljc2h5dHZqaWN2dWdkaGNibXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzczNzEsImV4cCI6MjA5MTI1MzM3MX0.1vWQO-dJiTANuAtGCImG9yfMHSqxnr7idI5EP_kx5EI';
+const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
+const SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let allPicks = [];
@@ -138,7 +145,7 @@ let allProps = [];
 const TODAY = new Date().toISOString().slice(0,10);
 const YESTERDAY = new Date(Date.now()-86400000).toISOString().slice(0,10);
 
-document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}).toUpperCase();
 
 async function loadAll(){
   const [picksRes, propsRes] = await Promise.all([
@@ -156,8 +163,8 @@ function renderSummary(){
   const resolved = allPicks.filter(p=>p.hit!==null);
   const hits = resolved.filter(p=>p.hit).length;
   const misses = resolved.length - hits;
-  const rate = resolved.length ? (hits/resolved.length*100).toFixed(1)+'%' : '—';
-  const avg = allPicks.length ? (allPicks.reduce((a,b)=>a+b.projected_prob,0)/allPicks.length).toFixed(1)+'%' : '—';
+  const rate = resolved.length?(hits/resolved.length*100).toFixed(1)+'%':'—';
+  const avg = allPicks.length?(allPicks.reduce((a,b)=>a+b.projected_prob,0)/allPicks.length).toFixed(1)+'%':'—';
   document.getElementById('s-total').textContent = allPicks.length;
   document.getElementById('s-hits').textContent = hits;
   document.getElementById('s-misses').textContent = misses;
@@ -169,7 +176,7 @@ function renderYesterday(){
   const yday = allPicks.filter(p=>p.pick_date===YESTERDAY&&p.hit!==null);
   if(!yday.length) return;
   const hits = yday.filter(p=>p.hit).length;
-  document.getElementById('yday-bar').style.display='flex';
+  document.getElementById('yday-strip').style.display='flex';
   document.getElementById('y-total').textContent = yday.length;
   document.getElementById('y-hits').textContent = hits;
   document.getElementById('y-misses').textContent = yday.length-hits;
@@ -185,54 +192,71 @@ function setTab(t,el){
 }
 
 function renderTab(t){
-  if(t==='today') renderPicks('today', allPicks.filter(p=>p.pick_date===TODAY));
-  else if(t==='mlb') renderPicks('mlb', allPicks.filter(p=>p.sport==='MLB'));
-  else if(t==='nba') renderPicks('nba', allPicks.filter(p=>p.sport==='NBA'));
+  if(t==='today') renderPicks('today',allPicks.filter(p=>p.pick_date===TODAY));
+  else if(t==='mlb') renderPicks('mlb',allPicks.filter(p=>p.sport==='MLB'));
+  else if(t==='nba') renderPicks('nba',allPicks.filter(p=>p.sport==='NBA'));
   else if(t==='nfl') renderNFL();
   else if(t==='props') renderProps();
   else if(t==='history') renderHistory();
 }
 
-function confColor(prob){
-  if(prob>=85) return '#f0c040';
-  if(prob>=70) return '#4a90d9';
-  return '#d4a017';
+function sportBadge(sport){
+  const cls=sport==='NBA'?'sport-nba':sport==='MLB'?'sport-mlb':'sport-nfl';
+  return '<span class="sport-badge '+cls+'">'+sport+'</span>';
+}
+
+function confBadge(c){
+  const map={very_high:'cb-vh',high:'cb-h',moderate:'cb-m',low_moderate:'cb-lm'};
+  const label={very_high:'Very high',high:'High',moderate:'Moderate',low_moderate:'Low-mod'};
+  return '<span class="conf-badge '+(map[c]||'cb-m')+'">'+(label[c]||c||'—')+'</span>';
+}
+
+function confColor(p){
+  if(p>=85) return '#53d98e';
+  if(p>=70) return '#5b9bd5';
+  return '#d5a85b';
+}
+
+function resultBadge(hit){
+  if(hit===null||hit===undefined) return '<span class="res-badge rb-pend">Pending</span>';
+  return hit?'<span class="res-badge rb-hit">Hit</span>':'<span class="res-badge rb-miss">Miss</span>';
 }
 
 function renderPicks(tabId, picks){
-  const el = document.getElementById('tab-'+tabId);
-  if(!picks.length){el.innerHTML='<div class="empty">No picks found for this selection.</div>';return;}
-  let html=`<div class="section-label">${picks.length} pick${picks.length>1?'s':''}</div>`;
+  const el=document.getElementById('tab-'+tabId);
+  if(!picks.length){el.innerHTML='<div class="empty">No picks found</div>';return;}
+  let html='<div class="section-label">'+picks.length+' pick'+(picks.length>1?'s':'')+'</div>';
   picks.forEach(p=>{
     const cls=p.hit===null?(p.projected_prob>=80?'top':''):(p.hit?'hit':'miss');
-    const badge=p.hit===null?'<span class="badge b-yellow">Pending</span>':(p.hit?'<span class="badge b-green">Hit</span>':'<span class="badge b-red">Miss</span>');
-    const factors=(p.key_factors||[]);
-    const factorHTML=factors.length?`<div class="key-factors">${factors.map(f=>`<span class="factor-tag">${f}</span>`).join('')}</div>`:'';
     const margin=p.projected_margin>0?'+'+p.projected_margin:p.projected_margin;
+    const factors=(p.key_factors||[]).map(f=>'<span class="factor">'+f+'</span>').join('');
     html+=`<div class="pick ${cls}" onclick="this.classList.toggle('open')">
-      <div class="pick-sport">${p.sport} · ${p.pick_date} · ${p.game_time_est||''}</div>
-      <div class="pick-top-row">
-        <div style="flex:1;min-width:0;">
-          <div class="pick-teams">${p.away_team} @ ${p.home_team}</div>
-          <div class="pick-side">Pick: ${p.pick_side}</div>
+      <div class="pick-accent"></div>
+      <div class="pick-body">
+        <div class="pick-sport-row">${sportBadge(p.sport)}<span class="time-label">${p.game_time_est||p.pick_date||''}</span></div>
+        <div class="pick-main-row">
+          <div style="flex:1;min-width:0;">
+            <div class="pick-teams">${p.away_team}<br>@ ${p.home_team}</div>
+            <div class="pick-side-label">Pick: ${p.pick_side}</div>
+          </div>
+          <div class="pick-right">
+            <div class="prob-big">${p.projected_prob}%</div>
+            <div class="prob-label">Win prob</div>
+          </div>
         </div>
-        <div class="pick-prob">
-          <div class="pick-prob-num">${p.projected_prob}%</div>
-          <div class="pick-prob-lbl">win prob</div>
+        <div class="metrics-row">
+          <div class="metric"><div class="metric-l">Proj. margin</div><div class="metric-v">${margin}</div></div>
+          <div class="metric"><div class="metric-l">Proj. total</div><div class="metric-v">${p.projected_total}</div></div>
+          <div class="metric"><div class="metric-l">Confidence</div><div class="metric-v">${confBadge(p.confidence)}</div></div>
         </div>
+        ${factors?'<div class="factors-row">'+factors+'</div>':''}
+        <div class="conf-row">
+          <div class="conf-track"><div class="conf-fill" style="width:${p.projected_prob}%;background:${confColor(p.projected_prob)};"></div></div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="rationale">${p.rationale||'No rationale available.'}</div>
+        <div class="outcome-row"><span>Result:</span>${resultBadge(p.hit)}${p.actual_result?'<span style="color:#555;margin-left:6px;">'+p.actual_result+'</span>':''}</div>
       </div>
-      <div class="pick-metrics">
-        <div class="pm"><div class="pm-l">Proj. margin</div><div class="pm-v">${margin}</div></div>
-        <div class="pm"><div class="pm-l">Proj. total</div><div class="pm-v">${p.projected_total}</div></div>
-        <div class="pm"><div class="pm-l">Confidence</div><div class="pm-v"><span class="badge ${p.confidence==='very_high'?'b-gold':p.confidence==='high'?'b-blue':'b-yellow'}">${(p.confidence||'—').replace('_',' ')}</span></div></div>
-      </div>
-      ${factorHTML}
-      <div class="conf-wrap">
-        <div class="conf-bar"><div class="conf-fill" style="width:${p.projected_prob}%;background:${confColor(p.projected_prob)};"></div></div>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="rationale">${p.rationale||'No rationale available.'}</div>
-      <div class="outcome-row"><span>Result:</span>${badge}${p.actual_result?`<span style="color:#3a4a6b;margin-left:4px;">${p.actual_result}</span>`:''}</div>
     </div>`;
   });
   el.innerHTML=html;
@@ -241,36 +265,40 @@ function renderPicks(tabId, picks){
 function renderProps(){
   const el=document.getElementById('tab-props');
   const todayProps=allProps.filter(p=>p.pick_date===TODAY);
-  if(!todayProps.length){el.innerHTML='<div class="empty">No player props for today yet.<br>Props generate alongside daily picks at 11 AM EST.</div>';return;}
-  let html=`<div class="section-label">${todayProps.length} player props today</div>`;
+  if(!todayProps.length){el.innerHTML='<div class="empty">No props today — check back after 11 AM EST</div>';return;}
+  let html='<div class="section-label">'+todayProps.length+' player props today</div>';
   todayProps.forEach(p=>{
-    const edge=(p.pick_side==='Over'?p.projected_value-p.prop_line:p.prop_line-p.projected_value);
+    const edge=p.pick_side==='Over'?p.projected_value-p.prop_line:p.prop_line-p.projected_value;
     const edgeStr=(edge>=0?'+':'')+edge.toFixed(1);
-    const badge=p.hit===null?'<span class="badge b-yellow">Pending</span>':(p.hit?'<span class="badge b-green">Hit</span>':'<span class="badge b-red">Miss</span>');
+    const sideClass=p.pick_side==='Over'?'prop-over':'prop-under';
     html+=`<div class="pick top" onclick="this.classList.toggle('open')">
-      <div class="pick-sport">${p.sport} · ${p.prop_type}</div>
-      <div class="pick-top-row">
-        <div style="flex:1;min-width:0;">
-          <div class="pick-teams" style="font-size:15px;">${p.player_name}</div>
-          <div class="pick-side">${p.team} vs ${p.opponent} · ${p.pick_side} ${p.prop_line} ${p.prop_type}</div>
+      <div class="pick-accent"></div>
+      <div class="pick-body">
+        <div class="pick-sport-row">${sportBadge(p.sport)}<span class="time-label">${p.prop_type?p.prop_type.toUpperCase():''}</span></div>
+        <div class="pick-main-row">
+          <div style="flex:1;min-width:0;">
+            <div class="prop-player">${p.player_name}</div>
+            <div class="prop-line-big ${sideClass}">${p.pick_side?p.pick_side.toUpperCase():''} ${p.prop_line||'—'}</div>
+            <div style="font-size:12px;font-weight:700;color:#555;margin-top:4px;">${p.team} vs ${p.opponent}</div>
+          </div>
+          <div class="pick-right">
+            <div class="prob-big" style="font-size:32px;color:${p.pick_side==='Over'?'#53d98e':'#ff4f4f'}">${edgeStr}</div>
+            <div class="prob-label">Edge</div>
+          </div>
         </div>
-        <div class="pick-prob">
-          <div class="pick-prob-num" style="font-size:22px;">${edgeStr}</div>
-          <div class="pick-prob-lbl">edge</div>
+        <div class="metrics-row">
+          <div class="metric"><div class="metric-l">Proj. value</div><div class="metric-v">${p.projected_value||'—'}</div></div>
+          <div class="metric"><div class="metric-l">Last 5 avg</div><div class="metric-v">${p.last_5_avg||'—'}</div></div>
+          <div class="metric"><div class="metric-l">Season avg</div><div class="metric-v">${p.season_avg||'—'}</div></div>
         </div>
+        <div class="conf-row">
+          <div class="conf-track"><div class="conf-fill" style="width:72%;background:#53d98e;"></div></div>
+          ${confBadge(p.confidence)}
+          <span class="chevron">▼</span>
+        </div>
+        <div class="rationale">${p.rationale||''}</div>
+        <div class="outcome-row"><span>Result:</span>${resultBadge(p.hit)}${p.actual_value?'<span style="color:#555;margin-left:6px;">Actual: '+p.actual_value+'</span>':''}</div>
       </div>
-      <div class="pick-metrics">
-        <div class="pm"><div class="pm-l">Proj. value</div><div class="pm-v">${p.projected_value}</div></div>
-        <div class="pm"><div class="pm-l">Last 5 avg</div><div class="pm-v">${p.last_5_avg||'—'}</div></div>
-        <div class="pm"><div class="pm-l">Season avg</div><div class="pm-v">${p.season_avg||'—'}</div></div>
-      </div>
-      <div class="conf-wrap">
-        <div class="conf-bar"><div class="conf-fill" style="width:72%;background:#f0c040;"></div></div>
-        <span class="badge b-blue">${p.confidence||'—'}</span>
-        <span class="chevron">▼</span>
-      </div>
-      <div class="rationale">${p.rationale||''}</div>
-      <div class="outcome-row"><span>Result:</span>${badge}${p.actual_value?`<span style="color:#3a4a6b;margin-left:4px;">Actual: ${p.actual_value}</span>`:''}</div>
     </div>`;
   });
   el.innerHTML=html;
@@ -282,11 +310,17 @@ function renderNFL(){
 
 function renderHistory(){
   const el=document.getElementById('tab-history');
-  if(!allPicks.length){el.innerHTML='<div class="empty">No history yet.</div>';return;}
-  let html=`<div class="section-label">${allPicks.length} total picks logged</div><div style="overflow-x:auto;"><table class="hist-table"><thead><tr><th>Date</th><th>Sport</th><th>Matchup</th><th>Pick</th><th>Prob</th><th>Result</th></tr></thead><tbody>`;
+  if(!allPicks.length){el.innerHTML='<div class="empty">No history yet</div>';return;}
+  let html='<div class="section-label">'+allPicks.length+' total picks logged</div><div style="overflow-x:auto"><table class="hist-table"><thead><tr><th>Date</th><th>Sport</th><th>Matchup</th><th>Pick</th><th>Prob</th><th>Result</th></tr></thead><tbody>';
   allPicks.forEach(p=>{
-    const badge=p.hit===null?'<span class="badge b-yellow">Pending</span>':(p.hit?'<span class="badge b-green">Hit</span>':'<span class="badge b-red">Miss</span>');
-    html+=`<tr><td>${p.pick_date}</td><td>${p.sport}</td><td style="color:#c8c4b9">${p.away_team} @ ${p.home_team}</td><td style="color:#c8c4b9">${p.pick_side}</td><td style="color:#f0c040;font-family:'Playfair Display',serif">${p.projected_prob}%</td><td>${badge}</td></tr>`;
+    html+=`<tr>
+      <td>${p.pick_date}</td>
+      <td>${sportBadge(p.sport)}</td>
+      <td style="color:#ddd;font-weight:700">${p.away_team} @ ${p.home_team}</td>
+      <td style="color:#ddd;font-weight:700">${p.pick_side}</td>
+      <td style="color:#53d98e;font-weight:900;font-family:'Barlow Condensed',sans-serif;font-size:16px">${p.projected_prob}%</td>
+      <td>${resultBadge(p.hit)}</td>
+    </tr>`;
   });
   html+='</tbody></table></div>';
   el.innerHTML=html;
