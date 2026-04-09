@@ -228,12 +228,14 @@ function renderPicks(tabId, picks){
   let html='<div class="section-label">'+picks.length+' pick'+(picks.length>1?'s':'')+'</div>';
   picks.forEach(p=>{
     const cls=p.hit===null?(p.projected_prob>=80?'top':''):(p.hit?'hit':'miss');
+const sharpBadge=p.sharp_money_signal?'<span class="sport-badge" style="background:#2d1f00;color:#f0a500;margin-left:6px;">SHARP MONEY</span>':'';
+const injuryBadge=p.injury_alert?'<span class="sport-badge" style="background:#2d0000;color:#ff4f4f;margin-left:6px;">INJURY ALERT</span>':'';
     const margin=p.projected_margin>0?'+'+p.projected_margin:p.projected_margin;
     const factors=(p.key_factors||[]).map(f=>'<span class="factor">'+f+'</span>').join('');
     html+=`<div class="pick ${cls}" onclick="this.classList.toggle('open')">
       <div class="pick-accent"></div>
       <div class="pick-body">
-        <div class="pick-sport-row">${sportBadge(p.sport)}<span class="time-label">${p.game_time_est||p.pick_date||''}</span></div>
+        <div class="pick-sport-row">${sportBadge(p.sport)}${sharpBadge}${injuryBadge}<span class="time-label">${p.game_time_est||p.pick_date||''}</span></div>
         <div class="pick-main-row">
           <div style="flex:1;min-width:0;">
             <div class="pick-teams">${p.away_team}<br>@ ${p.home_team}</div>
