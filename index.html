@@ -9,175 +9,197 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;background:#0d0d10;color:#fff;font-family:'Barlow',sans-serif;overflow-x:hidden;}
-.wrap{display:flex;min-height:100vh;}
-.sidebar{width:190px;background:#111116;border-right:1px solid #1e1e28;padding:16px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
-.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff;letter-spacing:-0.5px;margin-bottom:2px;}
+html,body{height:100%;background:#0d0d10;color:#fff;font-family:'Barlow',sans-serif;}
+.app{display:flex;min-height:100vh;}
+
+.sidebar{width:188px;background:#111116;border-right:1px solid #1e1e28;padding:16px 14px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:#fff;letter-spacing:-0.5px;}
 .logo span{color:#53d98e;}
-.tagline{font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:20px;}
-.s-label{font-size:10px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;margin-top:16px;}
-.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;}
-.stat-box{background:#1a1a22;border-radius:8px;padding:10px 8px;text-align:center;}
-.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;line-height:1;}
-.stat-num.g{color:#53d98e;}
-.stat-num.r{color:#ff4f4f;}
-.stat-num.sm{font-size:20px;}
-.stat-sub{font-size:10px;color:#555;font-weight:700;text-transform:uppercase;margin-top:2px;}
-.conf-track{background:#1a1a22;border-radius:4px;height:4px;margin-bottom:6px;position:relative;}
-.conf-thumb{width:14px;height:14px;background:#53d98e;border-radius:50%;position:absolute;top:-5px;left:40%;transform:translateX(-50%);}
-.conf-dots{display:flex;justify-content:space-between;font-size:10px;color:#555;font-weight:700;}
-.fbtn-group{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;}
-.fbtn{font-size:10px;font-weight:800;padding:4px 8px;border-radius:5px;border:none;cursor:pointer;background:#1a1a22;color:#666;font-family:'Barlow',sans-serif;text-transform:uppercase;letter-spacing:0.04em;}
-.fbtn.active{background:#53d98e;color:#0a1f12;}
-.record-box{background:#1a1a22;border-radius:8px;padding:12px;margin-top:4px;}
-.record-big{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fff;}
-.record-rate{font-size:12px;font-weight:800;color:#53d98e;}
-.record-sub{font-size:10px;color:#666;font-weight:700;margin-top:4px;}
-.record-sub b{color:#aaa;}
+.tagline{font-size:10px;color:#444;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:18px;}
+.slabel{font-size:10px;font-weight:800;color:#444;text-transform:uppercase;letter-spacing:0.08em;margin:14px 0 7px;}
+.stat2{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;}
+.sbox{background:#1a1a22;border-radius:7px;padding:9px 7px;text-align:center;}
+.snum{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:#fff;line-height:1;}
+.snum.g{color:#53d98e;}
+.snum.sm{font-size:19px;}
+.ssub{font-size:10px;color:#444;font-weight:700;text-transform:uppercase;margin-top:2px;}
+.conf-wrap{margin-bottom:4px;}
+.conf-slider{width:100%;background:#1a1a22;border-radius:4px;height:4px;position:relative;margin:6px 0 4px;}
+.conf-dot{width:13px;height:13px;background:#53d98e;border-radius:50%;position:absolute;top:-4.5px;left:38%;transform:translateX(-50%);}
+.conf-ends{display:flex;justify-content:space-between;font-size:10px;color:#444;font-weight:700;}
+.fbtns{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px;}
+.fbtn{font-size:10px;font-weight:800;padding:4px 8px;border-radius:5px;border:none;cursor:pointer;background:#1a1a22;color:#555;font-family:'Barlow',sans-serif;text-transform:uppercase;letter-spacing:0.04em;transition:all .12s;}
+.fbtn.on{background:#53d98e;color:#0a1f12;}
+.rec-box{background:#1a1a22;border-radius:8px;padding:11px 10px;}
+.rec-row{display:flex;align-items:baseline;justify-content:space-between;}
+.rec-big{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:#fff;}
+.rec-pct{font-size:12px;font-weight:800;color:#53d98e;}
+.rec-sub{font-size:10px;color:#555;font-weight:700;margin-top:4px;}
+.rec-sub b{color:#888;}
+.rec-live{font-size:10px;color:#444;font-weight:700;margin-top:6px;}
+
 .main{flex:1;min-width:0;display:flex;flex-direction:column;}
-.topbar{background:#111116;border-bottom:1px solid #1e1e28;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;flex-shrink:0;}
-.t-pill{font-size:11px;font-weight:700;color:#555;background:#1a1a22;padding:5px 12px;border-radius:20px;display:flex;align-items:center;gap:6px;}
-.t-pill .dot{width:6px;height:6px;background:#53d98e;border-radius:50%;flex-shrink:0;}
-.t-pill .dot.r{background:#ff4f4f;}
-.yday-center{font-size:12px;font-weight:700;color:#888;text-align:center;}
-.yday-center b{color:#53d98e;}
-.sport-tabs{background:#111116;border-bottom:1px solid #1e1e28;padding:0 20px;display:flex;gap:0;flex-shrink:0;overflow-x:auto;}
-.stab{font-size:11px;font-weight:800;padding:11px 16px;border:none;background:transparent;color:#555;cursor:pointer;font-family:'Barlow',sans-serif;text-transform:uppercase;letter-spacing:0.06em;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s;}
-.stab.active{color:#fff;border-bottom:2px solid #53d98e;}
-.stab:hover:not(.active){color:#aaa;}
-.cnt{font-size:9px;font-weight:900;background:#2a2a35;color:#666;border-radius:10px;padding:1px 5px;margin-left:4px;}
-.stab.active .cnt{background:#53d98e;color:#0a1f12;}
-.content{padding:20px;flex:1;}
-.picks-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
-.picks-title{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#fff;}
-.picks-title .score{font-size:15px;color:#53d98e;font-weight:900;margin-left:8px;}
-.picks-date{font-size:11px;color:#555;font-weight:600;margin-top:2px;}
-.game-filters{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-.gfbtn{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #2a2a35;background:transparent;color:#666;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .15s;}
-.gfbtn.active{background:#fff;color:#0d0d10;border-color:#fff;}
-.picks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;}
-.pick-card{background:#18181f;border-radius:12px;overflow:hidden;cursor:pointer;transition:background .15s;border:1px solid #1e1e28;}
-.pick-card:hover{background:#1f1f2a;}
-.pick-card.sharp{border-color:#2d1f00;}
-.pick-card.inj{border-color:#2d0f0f;}
-.pct{padding:14px 14px 10px;}
-.pch{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
-.badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+
+.topbar{background:#111116;border-bottom:1px solid #1e1e28;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;flex-shrink:0;}
+.tpill{font-size:11px;font-weight:700;color:#555;background:#1a1a22;padding:5px 11px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.tpill .dot{width:6px;height:6px;background:#53d98e;border-radius:50%;flex-shrink:0;}
+.yday-txt{font-size:12px;font-weight:700;color:#777;}
+.yday-txt b{color:#53d98e;}
+
+.tabs{background:#111116;border-bottom:1px solid #1e1e28;padding:0 18px;display:flex;gap:0;overflow-x:auto;flex-shrink:0;}
+.tab{font-size:11px;font-weight:800;padding:11px 14px;border:none;background:transparent;color:#555;cursor:pointer;font-family:'Barlow',sans-serif;text-transform:uppercase;letter-spacing:0.06em;border-bottom:2px solid transparent;white-space:nowrap;transition:color .12s;}
+.tab.on{color:#fff;border-bottom-color:#53d98e;}
+.tab:hover:not(.on){color:#999;}
+.tcnt{font-size:9px;font-weight:900;background:#222;color:#555;border-radius:10px;padding:1px 5px;margin-left:3px;}
+.tab.on .tcnt{background:#53d98e;color:#0a1f12;}
+
+.body{padding:18px;flex:1;}
+
+.phdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.ptitle{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#fff;}
+.pscore{font-size:15px;font-weight:900;color:#53d98e;margin-left:8px;}
+.pdate{font-size:11px;color:#444;font-weight:600;margin-top:2px;}
+.pcnt{font-size:11px;color:#444;font-weight:700;}
+
+.gfilters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.gfbtn{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;border:1px solid #222;background:transparent;color:#555;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .12s;}
+.gfbtn.on{background:#fff;color:#0d0d10;border-color:#fff;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:11px;}
+
+.card{background:#17171e;border-radius:12px;overflow:hidden;cursor:pointer;transition:background .12s;border:1px solid #1e1e28;}
+.card:hover{background:#1d1d26;}
+.card.sharp-card{border-color:#2d1f00;}
+.card.inj-card{border-color:#2d1010;}
+
+.ctop{padding:13px 13px 9px;}
+.chead{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
+.cbadges{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .grade{font-size:10px;font-weight:900;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;}
 .ga{background:#0f2d1a;color:#53d98e;}
-.gb{background:#1e2533;color:#5b9bd5;}
-.gm{background:#2d2200;color:#d5a85b;}
-.type-lbl{font-size:10px;font-weight:700;color:#555;text-transform:uppercase;}
-.sharp-badge{font-size:9px;font-weight:900;background:#2d1f00;color:#f0a500;padding:2px 6px;border-radius:4px;text-transform:uppercase;}
-.inj-badge{font-size:9px;font-weight:900;background:#2d0f0f;color:#ff4f4f;padding:2px 6px;border-radius:4px;text-transform:uppercase;}
-.pct-big{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;color:#fff;line-height:1;text-align:right;}
-.pct-lbl{font-size:9px;color:#555;font-weight:700;text-transform:uppercase;text-align:right;}
-.pname{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:4px;}
-.pmatch{font-size:11px;color:#555;font-weight:600;}
-.res-badge{font-size:9px;font-weight:900;padding:2px 7px;border-radius:4px;margin-left:6px;vertical-align:middle;}
-.rb-w{background:#0f2d1a;color:#53d98e;}
-.rb-l{background:#2d0f0f;color:#ff4f4f;}
-.rb-p{background:#2d2200;color:#d5a85b;}
-.score-row{background:#111116;padding:9px 14px;border-top:1px solid #1e1e28;display:flex;align-items:center;justify-content:space-between;}
-.score-teams{font-size:12px;font-weight:700;color:#aaa;}
-.score-fin{font-size:10px;color:#555;font-weight:600;margin-left:6px;}
-.score-res{font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;margin-left:6px;}
-.sr-w{background:#0f2d1a;color:#53d98e;}
-.sr-l{background:#2d0f0f;color:#ff4f4f;}
-.book-lbl{font-size:11px;font-weight:700;color:#555;}
-.book-lbl b{color:#888;}
-.card-bot{padding:9px 14px;border-top:1px solid #1e1e28;}
-.cbar-row{display:flex;align-items:center;gap:8px;}
-.cbar-track{flex:1;height:3px;background:#2a2a35;border-radius:2px;overflow:hidden;}
+.gb{background:#1b2535;color:#5b9bd5;}
+.gc{background:#2b2010;color:#d5a85b;}
+.sport-lbl{font-size:10px;font-weight:700;color:#444;text-transform:uppercase;}
+.sharp-tag{font-size:9px;font-weight:900;background:#2d1f00;color:#f0a500;padding:2px 6px;border-radius:4px;text-transform:uppercase;}
+.inj-tag{font-size:9px;font-weight:900;background:#2d1010;color:#ff5555;padding:2px 6px;border-radius:4px;text-transform:uppercase;}
+.prob-big{font-family:'Barlow Condensed',sans-serif;font-size:42px;font-weight:900;color:#fff;line-height:1;text-align:right;}
+.prob-lbl{font-size:9px;color:#444;font-weight:700;text-transform:uppercase;text-align:right;}
+
+.pick-name{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:3px;}
+.pick-match{font-size:11px;color:#444;font-weight:600;}
+
+.res{font-size:9px;font-weight:900;padding:2px 7px;border-radius:4px;margin-left:5px;vertical-align:middle;}
+.rw{background:#0f2d1a;color:#53d98e;}
+.rl{background:#2d0f0f;color:#ff4f4f;}
+.rp{background:#2b1e00;color:#d5a85b;}
+
+.crow{background:#111116;padding:8px 13px;border-top:1px solid #1e1e28;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.crow-left{font-size:11px;font-weight:700;color:#888;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.crow-fin{font-size:10px;color:#444;font-weight:600;}
+.crow-res{font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;}
+.crw{background:#0f2d1a;color:#53d98e;}
+.crl{background:#2d0f0f;color:#ff4f4f;}
+.crow-right{font-size:11px;font-weight:700;color:#444;white-space:nowrap;}
+.crow-right b{color:#666;}
+
+.cbot{padding:9px 13px;border-top:1px solid #1e1e28;}
+.cbar-row{display:flex;align-items:center;gap:7px;}
+.cbar{flex:1;height:3px;background:#222;border-radius:2px;overflow:hidden;}
 .cbar-fill{height:100%;border-radius:2px;}
-.cbar-lbl{font-size:10px;font-weight:700;color:#555;text-transform:uppercase;white-space:nowrap;}
-.rationale-box{font-size:11px;color:#888;line-height:1.6;border-top:1px solid #1e1e28;padding:10px 14px;display:none;}
-.pick-card.open .rationale-box{display:block;}
-.empty{text-align:center;padding:60px;color:#555;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
-.loading{text-align:center;padding:60px;color:#555;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
-.nfl-box{background:#18181f;border-radius:14px;padding:60px;text-align:center;border:1px solid #1e1e28;}
+.cbar-lbl{font-size:10px;font-weight:700;color:#444;text-transform:uppercase;white-space:nowrap;}
+
+.rat{font-size:11px;color:#777;line-height:1.6;border-top:1px solid #1e1e28;padding:9px 13px;display:none;}
+.card.open .rat{display:block;}
+
+.nfl-wrap{background:#17171e;border-radius:12px;padding:60px;text-align:center;border:1px solid #1e1e28;}
 .nfl-big{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:#fff;margin-bottom:10px;text-transform:uppercase;letter-spacing:-1px;}
-.nfl-sub{font-size:13px;font-weight:600;color:#555;line-height:1.9;}
+.nfl-sub{font-size:13px;font-weight:600;color:#444;line-height:1.9;}
+
 .hist-wrap{overflow-x:auto;}
-.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
-.hist-table th{text-align:left;padding:8px 12px;color:#555;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #1e1e28;}
-.hist-table td{padding:11px 12px;border-bottom:1px solid #18181f;color:#aaa;font-weight:600;}
-.hist-table tr:hover td{background:#18181f;}
-.prop-over{color:#53d98e;}
-.prop-under{color:#ff4f4f;}
-@media(max-width:700px){.sidebar{display:none;}.picks-grid{grid-template-columns:1fr;}.topbar{flex-direction:column;gap:6px;}.yday-center{font-size:11px;}}
+.htable{width:100%;border-collapse:collapse;font-size:12px;}
+.htable th{text-align:left;padding:8px 12px;color:#444;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid #1e1e28;}
+.htable td{padding:11px 12px;border-bottom:1px solid #17171e;color:#888;font-weight:600;}
+.htable tr:hover td{background:#17171e;}
+
+.empty{text-align:center;padding:60px;color:#444;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;}
+.loading{text-align:center;padding:60px;color:#444;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+@media(max-width:680px){.sidebar{display:none;}.grid{grid-template-columns:1fr;}.topbar{flex-direction:column;gap:6px;}.yday-txt{text-align:center;}}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
   <div class="sidebar">
     <div class="logo">Edge<span>Model</span></div>
     <div class="tagline">Sharp picks daily</div>
 
-    <div class="s-label">Today</div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="stat-num" id="s-picks">—</div><div class="stat-sub">Picks</div></div>
-      <div class="stat-box"><div class="stat-num" id="s-games">—</div><div class="stat-sub">Games</div></div>
+    <div class="slabel">Today</div>
+    <div class="stat2">
+      <div class="sbox"><div class="snum" id="s-picks">—</div><div class="ssub">Picks</div></div>
+      <div class="sbox"><div class="snum" id="s-games">—</div><div class="ssub">Games</div></div>
     </div>
-    <div class="stat-row">
-      <div class="stat-box"><div class="stat-num g sm" id="s-bestconf">—</div><div class="stat-sub">Best conf</div></div>
-      <div class="stat-box"><div class="stat-num sm" id="s-agrade">—</div><div class="stat-sub">A-grade</div></div>
+    <div class="stat2">
+      <div class="sbox"><div class="snum g sm" id="s-conf">—</div><div class="ssub">Best conf</div></div>
+      <div class="sbox"><div class="snum sm" id="s-agrade">—</div><div class="ssub">A-grade</div></div>
     </div>
 
-    <div class="s-label">Min confidence</div>
-    <div class="conf-track"><div class="conf-thumb"></div></div>
-    <div class="conf-dots"><span>50%</span><span>60%</span><span>90%</span></div>
+    <div class="slabel">Min confidence</div>
+    <div class="conf-wrap">
+      <div class="conf-slider"><div class="conf-dot"></div></div>
+      <div class="conf-ends"><span>50%</span><span>60%</span><span>90%</span></div>
+    </div>
 
-    <div class="s-label">Pick type</div>
-    <div class="fbtn-group">
-      <button class="fbtn active" onclick="setType('all',this)">All</button>
+    <div class="slabel">Pick type</div>
+    <div class="fbtns">
+      <button class="fbtn on" onclick="setType('all',this)">All</button>
       <button class="fbtn" onclick="setType('ml',this)">ML</button>
       <button class="fbtn" onclick="setType('spread',this)">Spread</button>
     </div>
-    <div class="fbtn-group">
+    <div class="fbtns">
       <button class="fbtn" onclick="setType('props',this)">Props</button>
       <button class="fbtn" onclick="setType('totals',this)">Totals</button>
     </div>
 
-    <div class="s-label">Today's record</div>
-    <div class="record-box">
-      <div style="display:flex;align-items:baseline;justify-content:space-between;">
-        <div class="record-big" id="r-record">—</div>
-        <div class="record-rate" id="r-rate">—</div>
+    <div class="slabel">Today's record</div>
+    <div class="rec-box">
+      <div class="rec-row">
+        <div class="rec-big" id="r-rec">—</div>
+        <div class="rec-pct" id="r-pct">—</div>
       </div>
-      <div class="record-sub" id="r-mlrate"></div>
-      <div class="record-sub" id="r-proprate"></div>
-      <div style="margin-top:8px;font-size:10px;color:#555;font-weight:700;" id="r-live"></div>
+      <div class="rec-sub" id="r-ml"></div>
+      <div class="rec-sub" id="r-prop"></div>
+      <div class="rec-live" id="r-live"></div>
     </div>
   </div>
 
   <div class="main">
     <div class="topbar">
-      <div class="t-pill"><div class="dot"></div><span id="t-updated">Loading...</span></div>
-      <div class="yday-center" id="t-yday">Loading yesterday's results...</div>
-      <div class="t-pill"><div class="dot"></div><span id="t-live">Live tracker</span></div>
+      <div class="tpill"><div class="dot"></div><span id="t-updated">Loading...</span></div>
+      <div class="yday-txt" id="t-yday">Loading...</div>
+      <div class="tpill"><div class="dot"></div><span id="t-live">Live tracker</span></div>
     </div>
 
-    <div class="sport-tabs">
-      <button class="stab active" onclick="setTab('today',this)">Today <span class="cnt" id="cnt-today">—</span></button>
-      <button class="stab" onclick="setTab('mlb',this)">MLB <span class="cnt" id="cnt-mlb">—</span></button>
-      <button class="stab" onclick="setTab('nba',this)">NBA <span class="cnt" id="cnt-nba">—</span></button>
-      <button class="stab" onclick="setTab('nfl',this)">NFL <span class="cnt">0</span></button>
-      <button class="stab" onclick="setTab('props',this)">Props <span class="cnt" id="cnt-props">—</span></button>
-      <button class="stab" onclick="setTab('history',this)">History <span class="cnt">All</span></button>
+    <div class="tabs">
+      <button class="tab on" onclick="setTab('today',this)">Today<span class="tcnt" id="cnt-today">—</span></button>
+      <button class="tab" onclick="setTab('nba',this)">NBA<span class="tcnt" id="cnt-nba">—</span></button>
+      <button class="tab" onclick="setTab('mlb',this)">MLB<span class="tcnt" id="cnt-mlb">—</span></button>
+      <button class="tab" onclick="setTab('nfl',this)">NFL<span class="tcnt">0</span></button>
+      <button class="tab" onclick="setTab('props',this)">Props<span class="tcnt" id="cnt-props">—</span></button>
+      <button class="tab" onclick="setTab('history',this)">History<span class="tcnt">All</span></button>
     </div>
 
-    <div class="content">
-      <div class="picks-hdr">
+    <div class="body">
+      <div class="phdr">
         <div>
-          <div class="picks-title">Today's picks <span class="score" id="today-score"></span></div>
-          <div class="picks-date" id="today-date"></div>
+          <div class="ptitle" id="page-title">Today's picks <span class="pscore" id="page-score"></span></div>
+          <div class="pdate" id="page-date"></div>
         </div>
-        <div style="font-size:11px;color:#555;font-weight:700;" id="pick-count"></div>
+        <div class="pcnt" id="page-cnt"></div>
       </div>
-      <div class="game-filters" id="game-filters"></div>
-      <div id="picks-container"><div class="loading">Loading picks...</div></div>
+      <div class="gfilters" id="gfilters"></div>
+      <div id="main-content"><div class="loading">Loading picks...</div></div>
     </div>
   </div>
 
@@ -189,258 +211,245 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const TODAY = new Date().toISOString().slice(0,10);
 const YESTERDAY = new Date(Date.now()-86400000).toISOString().slice(0,10);
-const NOW = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
 
 let allPicks = [];
 let allProps = [];
 let currentTab = 'today';
 let currentType = 'all';
+let activeMatchup = 'all';
 
-document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+document.getElementById('page-date').textContent = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 
-async function loadAll(){
-  const [picksRes, propsRes] = await Promise.all([
+async function init(){
+  const [pr, pp] = await Promise.all([
     sb.from('picks').select('*').order('pick_date',{ascending:false}).order('projected_prob',{ascending:false}),
     sb.from('player_props').select('*').order('pick_date',{ascending:false})
   ]);
-  allPicks = picksRes.data || [];
-  allProps = propsRes.data || [];
-  buildUI();
+  allPicks = pr.data || [];
+  allProps = pp.data || [];
+  hydrate();
+  renderTab('today');
 }
 
-function buildUI(){
-  const todayPicks = allPicks.filter(p=>p.pick_date===TODAY);
-  const ydayPicks  = allPicks.filter(p=>p.pick_date===YESTERDAY&&p.hit!==null);
+function hydrate(){
+  const now = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  document.getElementById('t-updated').textContent = 'Updated ' + now;
 
-  document.getElementById('t-updated').textContent = 'Updated ' + NOW;
-
-  // Yesterday bar
-  if(ydayPicks.length){
-    const h = ydayPicks.filter(p=>p.hit).length;
-    document.getElementById('t-yday').innerHTML = 'Yesterday: <b>' + h + '/' + ydayPicks.length + '</b>';
-  } else {
-    document.getElementById('t-yday').textContent = 'No resolved picks from yesterday';
-  }
-
-  // Sidebar stats
+  const today = allPicks.filter(p=>p.pick_date===TODAY);
+  const yday  = allPicks.filter(p=>p.pick_date===YESTERDAY&&p.hit!==null);
+  const yHits = yday.filter(p=>p.hit).length;
   const resolved = allPicks.filter(p=>p.hit!==null);
   const hits = resolved.filter(p=>p.hit).length;
-  const pending = allPicks.filter(p=>p.pick_date===TODAY&&p.hit===null).length;
-  const agrade = todayPicks.filter(p=>p.projected_prob>=75).length;
-  const bestConf = todayPicks.length ? Math.max(...todayPicks.map(p=>p.projected_prob)) : 0;
+  const pending = today.filter(p=>p.hit===null).length;
 
-  document.getElementById('s-picks').textContent = todayPicks.length;
-  document.getElementById('s-games').textContent = new Set(todayPicks.map(p=>p.matchup)).size;
-  document.getElementById('s-bestconf').textContent = bestConf ? bestConf + '%' : '—';
-  document.getElementById('s-agrade').textContent = agrade;
-  document.getElementById('t-live').textContent = 'Live tracker · ' + pending + ' pending';
+  document.getElementById('t-yday').innerHTML = yday.length
+    ? 'Yesterday: <b>' + yHits + '/' + yday.length + '</b> &nbsp;|&nbsp; All time: <b>' + hits + '/' + resolved.length + '</b>'
+    : 'No resolved picks from yesterday';
+  document.getElementById('t-live').textContent = pending + ' picks live now';
 
-  const resolvedToday = todayPicks.filter(p=>p.hit!==null);
-  const hitsToday = resolvedToday.filter(p=>p.hit).length;
-  const rate = resolvedToday.length ? Math.round(hitsToday/resolvedToday.length*100) + '%' : '—';
-  document.getElementById('r-record').textContent = resolvedToday.length ? hitsToday + '-' + (resolvedToday.length-hitsToday) : '—';
-  document.getElementById('r-rate').textContent = rate;
+  document.getElementById('s-picks').textContent = today.length || '—';
+  document.getElementById('s-games').textContent = today.length ? new Set(today.map(p=>p.matchup)).size : '—';
+  const bestConf = today.length ? Math.max(...today.map(p=>p.projected_prob||0)) : 0;
+  document.getElementById('s-conf').textContent = bestConf ? bestConf+'%' : '—';
+  document.getElementById('s-agrade').textContent = today.filter(p=>(p.projected_prob||0)>=75).length || '—';
 
-  // Tab counts
-  document.getElementById('cnt-today').textContent = todayPicks.length;
-  document.getElementById('cnt-mlb').textContent = allPicks.filter(p=>p.sport==='MLB'&&p.pick_date===TODAY).length;
-  document.getElementById('cnt-nba').textContent = allPicks.filter(p=>p.sport==='NBA'&&p.pick_date===TODAY).length;
+  const todayRes  = today.filter(p=>p.hit!==null);
+  const todayHits = todayRes.filter(p=>p.hit).length;
+  const todayMiss = todayRes.length - todayHits;
+  document.getElementById('r-rec').textContent = todayRes.length ? todayHits+'-'+todayMiss : '—';
+  document.getElementById('r-pct').textContent = todayRes.length ? Math.round(todayHits/todayRes.length*100)+'%' : '—';
+  document.getElementById('r-live').textContent = pending + ' picks still live';
+
+  document.getElementById('cnt-today').textContent = today.length;
+  document.getElementById('cnt-nba').textContent = today.filter(p=>p.sport==='NBA').length;
+  document.getElementById('cnt-mlb').textContent = today.filter(p=>p.sport==='MLB').length;
   document.getElementById('cnt-props').textContent = allProps.filter(p=>p.pick_date===TODAY).length;
-
-  renderTab(currentTab);
 }
 
 function setTab(t, el){
-  document.querySelectorAll('.stab').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
   currentTab = t;
+  activeMatchup = 'all';
   renderTab(t);
 }
 
 function setType(t, el){
-  document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
   currentType = t;
   renderTab(currentTab);
 }
 
 function renderTab(t){
-  const container = document.getElementById('picks-container');
-  const filters = document.getElementById('game-filters');
-  const hdr = document.querySelector('.picks-title');
+  const title = document.getElementById('page-title');
+  const cnt   = document.getElementById('page-cnt');
+  const gf    = document.getElementById('gfilters');
+  const mc    = document.getElementById('main-content');
 
   if(t==='today'){
-    hdr.innerHTML = 'Today\'s picks <span class="score" id="today-score"></span>';
-    let picks = allPicks.filter(p=>p.pick_date===TODAY);
-    const h = picks.filter(p=>p.hit).length;
-    const tot = picks.filter(p=>p.hit!==null).length;
-    document.getElementById('pick-count').textContent = picks.length + ' picks';
-    if(tot) document.querySelector('#picks-container .score, .picks-title .score') && null;
-    renderPicksGrid(container, picks, filters);
-  } else if(t==='mlb'){
-    hdr.innerHTML = 'MLB picks';
-    renderPicksGrid(container, allPicks.filter(p=>p.sport==='MLB'&&p.pick_date===TODAY), filters);
+    title.innerHTML = 'Today\'s picks <span class="pscore" id="page-score"></span>';
+    const picks = allPicks.filter(p=>p.pick_date===TODAY);
+    cnt.textContent = picks.length + ' picks';
+    buildGameFilters(gf, picks);
+    mc.innerHTML = renderGrid(picks);
   } else if(t==='nba'){
-    hdr.innerHTML = 'NBA picks';
-    renderPicksGrid(container, allPicks.filter(p=>p.sport==='NBA'&&p.pick_date===TODAY), filters);
+    title.innerHTML = 'NBA picks';
+    const picks = allPicks.filter(p=>p.pick_date===TODAY&&p.sport==='NBA');
+    cnt.textContent = picks.length + ' picks';
+    buildGameFilters(gf, picks);
+    mc.innerHTML = renderGrid(picks);
+  } else if(t==='mlb'){
+    title.innerHTML = 'MLB picks';
+    const picks = allPicks.filter(p=>p.pick_date===TODAY&&p.sport==='MLB');
+    cnt.textContent = picks.length + ' picks';
+    buildGameFilters(gf, picks);
+    mc.innerHTML = renderGrid(picks);
   } else if(t==='nfl'){
-    filters.innerHTML = '';
-    container.innerHTML = '<div class="nfl-box"><div class="nfl-big">Offseason</div><div class="nfl-sub">Model tracking rosters, draft picks, and OTA reports.<br>NFL picks return August 2026.</div></div>';
+    title.innerHTML = 'NFL picks';
+    cnt.textContent = '';
+    gf.innerHTML = '';
+    mc.innerHTML = '<div class="nfl-wrap"><div class="nfl-big">Offseason</div><div class="nfl-sub">Model tracking rosters, draft picks, and OTA reports.<br>NFL picks return August 2026.</div></div>';
   } else if(t==='props'){
-    hdr.innerHTML = 'Player props';
-    filters.innerHTML = '';
-    renderPropsGrid(container);
+    title.innerHTML = 'Player props';
+    const props = allProps.filter(p=>p.pick_date===TODAY);
+    cnt.textContent = props.length + ' props';
+    gf.innerHTML = '';
+    mc.innerHTML = renderPropsGrid(props);
   } else if(t==='history'){
-    hdr.innerHTML = 'Pick history';
-    filters.innerHTML = '';
-    renderHistory(container);
+    title.innerHTML = 'Pick history';
+    cnt.textContent = allPicks.length + ' total';
+    gf.innerHTML = '';
+    mc.innerHTML = renderHistory();
   }
 }
 
-function gradeBadge(prob){
-  if(prob>=75) return '<span class="grade ga">A-Grade</span>';
-  if(prob>=65) return '<span class="grade gb">B-Grade</span>';
-  return '<span class="grade gm">C-Grade</span>';
+function buildGameFilters(el, picks){
+  const matchups = [...new Set(picks.map(p=>p.matchup))];
+  let html = '<button class="gfbtn on" onclick="filterMatchup(\'all\',this)">All</button>';
+  matchups.forEach(m=>{
+    const s = m.length>22 ? m.slice(0,22)+'…' : m;
+    html += '<button class="gfbtn" onclick="filterMatchup(`'+m.replace(/`/g,'\\`')+'`,this)">'+s+'</button>';
+  });
+  el.innerHTML = html;
 }
 
-function gradeColor(prob){
+function filterMatchup(m, el){
+  document.querySelectorAll('.gfbtn').forEach(x=>x.classList.remove('on'));
+  el.classList.add('on');
+  activeMatchup = m;
+  const base = currentTab==='nba' ? allPicks.filter(p=>p.pick_date===TODAY&&p.sport==='NBA')
+             : currentTab==='mlb' ? allPicks.filter(p=>p.pick_date===TODAY&&p.sport==='MLB')
+             : allPicks.filter(p=>p.pick_date===TODAY);
+  const picks = m==='all' ? base : base.filter(p=>p.matchup===m);
+  document.getElementById('main-content').innerHTML = renderGrid(picks);
+}
+
+function gradeClass(prob){
+  if(prob>=75) return 'ga';
+  if(prob>=65) return 'gb';
+  return 'gc';
+}
+function gradeLabel(prob){
+  if(prob>=75) return 'A-Grade';
+  if(prob>=65) return 'B-Grade';
+  return 'C-Grade';
+}
+function barColor(prob){
   if(prob>=75) return '#53d98e';
   if(prob>=65) return '#5b9bd5';
   return '#d5a85b';
 }
-
-function gradeLabel(prob){
+function barLabel(prob){
   if(prob>=75) return 'A-grade';
   if(prob>=65) return 'B-grade';
   return 'Moderate';
 }
-
-function resultBadge(hit){
-  if(hit===null||hit===undefined) return '<span class="res-badge rb-p">Pending</span>';
-  return hit ? '<span class="res-badge rb-w">Win</span>' : '<span class="res-badge rb-l">Loss</span>';
+function resBadge(hit){
+  if(hit===null||hit===undefined) return '<span class="res rp">Pending</span>';
+  return hit ? '<span class="res rw">Win</span>' : '<span class="res rl">Loss</span>';
 }
-
-function scoreResult(hit){
+function scoreRes(hit){
   if(hit===null||hit===undefined) return '';
-  return hit ? '<span class="score-res sr-w">Win</span>' : '<span class="score-res sr-l">Loss</span>';
-}
-
-function renderPicksGrid(container, picks, filtersEl){
-  // Game filters
-  const matchups = [...new Set(picks.map(p=>p.matchup))];
-  let filterHtml = '<button class="gfbtn active" onclick="filterGame(\'all\',this)">All</button>';
-  matchups.forEach(m=>{
-    const short = m.replace(' @ ',' @ ').substring(0,20);
-    filterHtml += '<button class="gfbtn" onclick="filterGame(\'' + m.replace(/'/g,"\\'") + '\',this)">' + short + '</button>';
-  });
-  filtersEl.innerHTML = filterHtml;
-
-  if(!picks.length){
-    container.innerHTML = '<div class="empty">No picks found — check back after 12 PM EST</div>';
-    return;
-  }
-
-  container.innerHTML = '<div class="picks-grid">' + picks.map(p=>pickCard(p)).join('') + '</div>';
+  return hit ? '<span class="crow-res crw">Win</span>' : '<span class="crow-res crl">Loss</span>';
 }
 
 function pickCard(p){
-  const sharp = p.sharp_money_signal ? '<span class="sharp-badge">Sharp</span>' : '';
-  const inj   = p.injury_alert ? '<span class="inj-badge">Injury alert</span>' : '';
-  const cardClass = p.sharp_money_signal ? 'pick-card sharp' : (p.injury_alert ? 'pick-card inj' : 'pick-card');
-  const prob  = p.projected_prob || 0;
-  const margin = p.projected_margin > 0 ? '+' + p.projected_margin : p.projected_margin;
-  const actual = p.actual_result ? '<span style="color:#555;font-size:10px;margin-left:4px;">' + p.actual_result + '</span>' : '';
-  return '<div class="' + cardClass + '" onclick="this.classList.toggle(\'open\')">' +
-    '<div class="pct">' +
-      '<div class="pch">' +
-        '<div class="badges">' + gradeBadge(prob) + '<span class="type-lbl">' + p.sport + '</span>' + sharp + inj + '</div>' +
-        '<div><div class="pct-big">' + prob + '%</div><div class="pct-lbl">Conf</div></div>' +
-      '</div>' +
-      '<div class="pname">' + p.pick_side + ' ' + resultBadge(p.hit) + '</div>' +
-      '<div class="pmatch">' + p.matchup + ' · ' + (p.game_time_est||'') + '</div>' +
-    '</div>' +
-    '<div class="score-row">' +
-      '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">' +
-        '<span class="score-teams">' + p.matchup + '</span>' +
-        (p.actual_result ? '<span class="score-fin">Final</span>' + scoreResult(p.hit) : '<span class="score-fin">Proj: ' + margin + ' | Total: ' + p.projected_total + '</span>') +
-      '</div>' +
-      '<span class="book-lbl"><b>' + p.confidence + '</b></span>' +
-    '</div>' +
-    '<div class="card-bot">' +
-      '<div class="cbar-row">' +
-        '<div class="cbar-track"><div class="cbar-fill" style="width:' + prob + '%;background:' + gradeColor(prob) + ';"></div></div>' +
-        '<span class="cbar-lbl">' + gradeLabel(prob) + '</span>' +
-      '</div>' +
-    '</div>' +
-    '<div class="rationale-box">' + (p.rationale||'No rationale available.') + '</div>' +
+  const prob   = p.projected_prob || 0;
+  const sharp  = p.sharp_money_signal ? '<span class="sharp-tag">Sharp</span>' : '';
+  const inj    = p.injury_alert ? '<span class="inj-tag">Injury alert</span>' : '';
+  const cls    = p.sharp_money_signal ? 'card sharp-card' : p.injury_alert ? 'card inj-card' : 'card';
+  const margin = p.projected_margin >= 0 ? '+'+p.projected_margin : p.projected_margin;
+  const scoreRowRight = p.actual_result
+    ? '<span class="crow-right"><b>'+p.confidence+'</b></span>'
+    : '<span class="crow-right">Proj: '+margin+' | O/U '+p.projected_total+'</span>';
+  const scoreRowLeft = p.actual_result
+    ? '<span class="crow-left">'+p.matchup+' <span class="crow-fin">Final</span>'+scoreRes(p.hit)+'<span style="font-size:10px;color:#444;margin-left:4px;">'+p.actual_result+'</span></span>'
+    : '<span class="crow-left">'+p.matchup+' <span class="crow-fin">'+p.game_time_est+'</span></span>';
+  return '<div class="'+cls+'" onclick="this.classList.toggle(\'open\')">'+
+    '<div class="ctop">'+
+      '<div class="chead">'+
+        '<div class="cbadges"><span class="grade '+gradeClass(prob)+'">'+gradeLabel(prob)+'</span><span class="sport-lbl">'+p.sport+'</span>'+sharp+inj+'</div>'+
+        '<div><div class="prob-big">'+prob+'%</div><div class="prob-lbl">Conf</div></div>'+
+      '</div>'+
+      '<div class="pick-name">'+p.pick_side+' '+resBadge(p.hit)+'</div>'+
+      '<div class="pick-match">'+p.matchup+' · '+p.game_time_est+'</div>'+
+    '</div>'+
+    '<div class="crow">'+scoreRowLeft+scoreRowRight+'</div>'+
+    '<div class="cbot"><div class="cbar-row"><div class="cbar"><div class="cbar-fill" style="width:'+prob+'%;background:'+barColor(prob)+';"></div></div><span class="cbar-lbl">'+barLabel(prob)+'</span></div></div>'+
+    '<div class="rat">'+(p.rationale||'No rationale available.')+'</div>'+
   '</div>';
 }
 
-function filterGame(matchup, el){
-  document.querySelectorAll('.gfbtn').forEach(x=>x.classList.remove('active'));
-  el.classList.add('active');
-  const container = document.getElementById('picks-container');
-  let picks = allPicks.filter(p=>p.pick_date===TODAY);
-  if(matchup!=='all') picks = picks.filter(p=>p.matchup===matchup);
-  container.innerHTML = '<div class="picks-grid">' + picks.map(p=>pickCard(p)).join('') + '</div>';
+function renderGrid(picks){
+  if(!picks.length) return '<div class="empty">No picks found — check back after 12 PM EST</div>';
+  return '<div class="grid">'+picks.map(p=>pickCard(p)).join('')+'</div>';
 }
 
-function renderPropsGrid(container){
-  const todayProps = allProps.filter(p=>p.pick_date===TODAY);
-  if(!todayProps.length){
-    container.innerHTML = '<div class="empty">No props today — check back after 12 PM EST</div>';
-    return;
-  }
-  const html = todayProps.map(p=>{
-    const edge = p.pick_side==='Over' ? p.projected_value-p.prop_line : p.prop_line-p.projected_value;
+function renderPropsGrid(props){
+  if(!props.length) return '<div class="empty">No props today — check back after 12 PM EST</div>';
+  const html = props.map(p=>{
+    const edge = p.pick_side==='Over' ? (p.projected_value||0)-(p.prop_line||0) : (p.prop_line||0)-(p.projected_value||0);
     const edgeStr = (edge>=0?'+':'')+edge.toFixed(1);
-    const sideClass = p.pick_side==='Over' ? 'prop-over' : 'prop-under';
+    const over = p.pick_side==='Over';
     const prob = p.confidence==='very_high'?78:p.confidence==='high'?70:62;
-    return '<div class="pick-card" onclick="this.classList.toggle(\'open\')">' +
-      '<div class="pct">' +
-        '<div class="pch">' +
-          '<div class="badges">' + gradeBadge(prob) + '<span class="type-lbl">Player prop · ' + (p.prop_type||'') + '</span></div>' +
-          '<div><div class="pct-big ' + sideClass + '">' + edgeStr + '</div><div class="pct-lbl">Edge</div></div>' +
-        '</div>' +
-        '<div class="pname">' + p.player_name + ' <span class="' + sideClass + '">' + (p.pick_side||'') + ' ' + (p.prop_line||'') + '</span> ' + resultBadge(p.hit) + '</div>' +
-        '<div class="pmatch">' + (p.team||'') + ' vs ' + (p.opponent||'') + '</div>' +
-      '</div>' +
-      '<div class="score-row">' +
-        '<div style="display:flex;align-items:center;gap:8px;">' +
-          '<span class="score-teams">Proj: ' + (p.projected_value||'—') + '</span>' +
-          '<span class="score-fin">Last 5: ' + (p.last_5_avg||'—') + ' · Season: ' + (p.season_avg||'—') + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="card-bot">' +
-        '<div class="cbar-row">' +
-          '<div class="cbar-track"><div class="cbar-fill" style="width:' + prob + '%;background:' + gradeColor(prob) + ';"></div></div>' +
-          '<span class="cbar-lbl">' + (p.confidence||'') + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="rationale-box">' + (p.rationale||'') + '</div>' +
+    return '<div class="card" onclick="this.classList.toggle(\'open\')">'+
+      '<div class="ctop">'+
+        '<div class="chead">'+
+          '<div class="cbadges"><span class="grade '+gradeClass(prob)+'">'+gradeLabel(prob)+'</span><span class="sport-lbl">'+p.sport+' · '+(p.prop_type||'')+'</span></div>'+
+          '<div><div class="prob-big" style="color:'+(over?'#53d98e':'#ff4f4f')+'">'+edgeStr+'</div><div class="prob-lbl">Edge</div></div>'+
+        '</div>'+
+        '<div class="pick-name">'+p.player_name+' <span style="color:'+(over?'#53d98e':'#ff4f4f')+'">'+(p.pick_side||'')+' '+(p.prop_line||'')+'</span> '+resBadge(p.hit)+'</div>'+
+        '<div class="pick-match">'+(p.team||'')+' vs '+(p.opponent||'')+'</div>'+
+      '</div>'+
+      '<div class="crow"><span class="crow-left">Proj: '+(p.projected_value||'—')+' · Last 5: '+(p.last_5_avg||'—')+' · Season: '+(p.season_avg||'—')+'</span></div>'+
+      '<div class="cbot"><div class="cbar-row"><div class="cbar"><div class="cbar-fill" style="width:'+prob+'%;background:'+barColor(prob)+';"></div></div><span class="cbar-lbl">'+(p.confidence||'')+'</span></div></div>'+
+      '<div class="rat">'+(p.rationale||'')+'</div>'+
     '</div>';
   });
-  container.innerHTML = '<div class="picks-grid">' + html.join('') + '</div>';
+  return '<div class="grid">'+html.join('')+'</div>';
 }
 
-function renderHistory(container){
-  if(!allPicks.length){container.innerHTML='<div class="empty">No history yet</div>';return;}
-  let html = '<div class="hist-wrap"><table class="hist-table"><thead><tr><th>Date</th><th>Sport</th><th>Pick</th><th>Prob</th><th>Margin</th><th>Result</th></tr></thead><tbody>';
+function renderHistory(){
+  if(!allPicks.length) return '<div class="empty">No history yet</div>';
+  let html = '<div class="hist-wrap"><table class="htable"><thead><tr><th>Date</th><th>Sport</th><th>Pick</th><th>Matchup</th><th>Prob</th><th>Margin</th><th>Result</th></tr></thead><tbody>';
   allPicks.forEach(p=>{
-    html += '<tr>' +
-      '<td>' + p.pick_date + '</td>' +
-      '<td>' + p.sport + '</td>' +
-      '<td style="color:#ddd;font-weight:700;">' + p.pick_side + '<br><span style="color:#555;font-size:10px;font-weight:600;">' + p.matchup + '</span></td>' +
-      '<td style="color:#53d98e;font-weight:900;font-family:\'Barlow Condensed\',sans-serif;font-size:16px;">' + p.projected_prob + '%</td>' +
-      '<td style="color:#888;">' + (p.projected_margin>0?'+':'')+p.projected_margin + '</td>' +
-      '<td>' + resultBadge(p.hit) + '</td>' +
+    const m = (p.projected_margin>=0?'+':'')+p.projected_margin;
+    html += '<tr>'+
+      '<td>'+p.pick_date+'</td>'+
+      '<td>'+p.sport+'</td>'+
+      '<td style="color:#ddd;font-weight:700;">'+p.pick_side+'</td>'+
+      '<td style="color:#555;">'+p.matchup+'</td>'+
+      '<td style="color:#53d98e;font-family:\'Barlow Condensed\',sans-serif;font-size:16px;font-weight:900;">'+p.projected_prob+'%</td>'+
+      '<td style="color:#666;">'+m+'</td>'+
+      '<td>'+resBadge(p.hit)+'</td>'+
     '</tr>';
   });
   html += '</tbody></table></div>';
-  container.innerHTML = html;
+  return html;
 }
 
-loadAll();
+init();
 </script>
 </body>
 </html>
